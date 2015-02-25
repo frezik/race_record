@@ -6,15 +6,13 @@ use SVG;
 require 'svg_creators.pl';
 use lib './svg_creators';
 
-use constant WIDTH_MM  => 85;
-use constant HEIGHT_MM => 56;
+use constant WIDTH_MM  => 26;
+use constant HEIGHT_MM => 34;
 
-use constant SCREW_HOLE_RADIUS_MM => (2.75 / 2);
-use constant SCREW_HOLE_COORDS => [
-    [ 3.5,            3.5            ],
-    [ 58 + (3.5 / 2), 3.5            ],
-    [ 3.5,            49 + (3.5 / 2) ],
-    [ 58 + (3.5 / 2), 49 + (3.5 / 2) ],
+use constant SCREW_HOLE_RADIUS_MM => 1;
+use constant SCREW_HOLE_COORDS    => [
+    [ 2,      2 ],
+    [ 26 - 2, 2 ],
 ];
 
 

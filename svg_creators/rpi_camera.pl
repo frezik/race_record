@@ -43,23 +43,23 @@ my $draw = $svg->group(
 $draw->rectangle(
     x      => 0,
     y      => 0,
-    width  => WIDTH_MM,
-    height => HEIGHT_MM,
+    width  => mm_to_px( WIDTH_MM ),
+    height => mm_to_px( HEIGHT_MM ),
 );
 
 # Draw lens
 $draw->rectangle(
-    x      => LENS_X_MM,
-    y      => LENS_Y_MM,
-    width  => LENS_WIDTH_MM,
-    height => LENS_HEIGHT_MM,
+    x      => mm_to_px( LENS_X_MM ),
+    y      => mm_to_px( LENS_Y_MM ),
+    width  => mm_to_px( LENS_WIDTH_MM ),
+    height => mm_to_px( LENS_HEIGHT_MM ),
 );
 
 # Draw screw holes
 $draw->circle(
-    cx => $_->[0],
-    cy => $_->[1],
-    r  => SCREW_HOLE_RADIUS_MM,
+    cx => mm_to_px( $_->[0] ),
+    cy => mm_to_px( $_->[1] ),
+    r  => mm_to_px( SCREW_HOLE_RADIUS_MM ),
 ) for @{ +SCREW_HOLE_COORDS };
 
 
