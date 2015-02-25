@@ -3,24 +3,18 @@ use v5.20;
 use warnings;
 use SVG;
 
-use lib './svg_creators';
 require 'svg_creators.pl';
+use lib './svg_creators';
 
+use constant WIDTH_MM  => 85;
+use constant HEIGHT_MM => 56;
 
-use constant WIDTH_MM  => 25;
-use constant HEIGHT_MM => 24;
-
-use constant LENS_WIDTH_MM  => 8;
-use constant LENS_HEIGHT_MM => 8;
-use constant LENS_X_MM      => 8.5;
-use constant LENS_Y_MM      => HEIGHT_MM - LENS_HEIGHT_MM - 5.5;
-
-use constant SCREW_HOLE_RADIUS_MM => 1;
+use constant SCREW_HOLE_RADIUS_MM => (2.75 / 2);
 use constant SCREW_HOLE_COORDS => [
-    [ 2,      2        ],
-    [ 2 + 21, 2        ],
-    [ 2,      2 + 12.5 ],
-    [ 2 + 21, 2 + 12.5 ],
+    [ 3.5,            3.5            ],
+    [ 58 + (3.5 / 2), 3.5            ],
+    [ 3.5,            49 + (3.5 / 2) ],
+    [ 58 + (3.5 / 2), 49 + (3.5 / 2) ],
 ];
 
 
@@ -45,14 +39,6 @@ $draw->rectangle(
     y      => 0,
     width  => WIDTH_MM,
     height => HEIGHT_MM,
-);
-
-# Draw lens
-$draw->rectangle(
-    x      => LENS_X_MM,
-    y      => LENS_Y_MM,
-    width  => LENS_WIDTH_MM,
-    height => LENS_HEIGHT_MM,
 );
 
 # Draw screw holes
