@@ -1,10 +1,10 @@
 #!perl
 use v5.20;
+use warnings;
+use lib './svg_creators';
 use SVG;
+require 'svg_creators.pl';
 
-# According to SVG spec, there are 3.543307 pixels per mm.  See:
-# http://www.w3.org/TR/SVG/coords.html#Units
-use constant MM_IN_PX  => 3.543307;
 use constant WIDTH_MM  => 25;
 use constant HEIGHT_MM => 24;
 
@@ -20,13 +20,6 @@ use constant SCREW_HOLE_COORDS => [
     [ 2,      2 + 12.5 ],
     [ 2 + 21, 2 + 12.5 ],
 ];
-
-
-sub mm_to_px
-{
-    my ($mm) = @_;
-    return $mm * MM_IN_PX;
-}
 
 
 
