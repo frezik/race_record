@@ -11,10 +11,10 @@ use constant HEIGHT_MM => 56;
 
 use constant SCREW_HOLE_RADIUS_MM => (2.75 / 2);
 use constant SCREW_HOLE_COORDS => [
-    [ 3.5,            3.5          ],
-    [ 58 + (4 / 2),   3.5          ],
-    [ 3.5,            49 + (4 / 2) ],
-    [ 58 + (4 / 2),   49 + (4 / 2) ],
+    [ 3.5,      3.5      ],
+    [ 58 + 3.5, 3.5      ],
+    [ 3.5,      49 + 3.5 ],
+    [ 58 + 3.5, 49 + 3.5 ],
 ];
 
 
