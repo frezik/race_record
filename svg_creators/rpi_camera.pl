@@ -15,7 +15,7 @@ use constant LENS_HEIGHT_MM => 8;
 use constant LENS_X_MM      => 8.5;
 use constant LENS_Y_MM      => HEIGHT_MM - LENS_HEIGHT_MM - 5.5;
 
-use constant SCREW_HOLE_RADIUS_MM => 1;
+use constant SCREW_HOLE_RADIUS_MM => 1.25;
 use constant SCREW_HOLE_COORDS => [
     [ 2,      2        ],
     [ 2 + 21, 2        ],

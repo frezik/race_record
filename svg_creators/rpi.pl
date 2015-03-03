@@ -9,7 +9,7 @@ use lib './svg_creators';
 use constant WIDTH_MM  => 85;
 use constant HEIGHT_MM => 56;
 
-use constant SCREW_HOLE_RADIUS_MM => (2.75 / 2);
+use constant SCREW_HOLE_RADIUS_MM => (2.75 / 2) + 0.25;
 use constant SCREW_HOLE_COORDS => [
     [ 3.5,      3.5      ],
     [ 58 + 3.5, 3.5      ],
