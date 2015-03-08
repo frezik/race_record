@@ -13,7 +13,7 @@
    viewBox=" 0 0 1356.024737 636.732807"
    id="svg3226"
    inkscape:version="0.48.5 r10040"
-   sodipodi:docname="caseplans(1).svg">
+   sodipodi:docname="caseplans.svg">
   <metadata
      id="metadata3256">
     <rdf:RDF>
@@ -22,7 +22,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -41,9 +41,9 @@
      inkscape:window-height="480"
      id="namedview3252"
      showgrid="false"
-     inkscape:zoom="0.34103227"
-     inkscape:cx="713.37978"
-     inkscape:cy="286.32235"
+     inkscape:zoom="0.48229246"
+     inkscape:cx="313.00548"
+     inkscape:cy="397.21724"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="0"
@@ -315,27 +315,22 @@
        id="tspan3078"
        x="386.79318"
        y="180.97023">GPS Ant</tspan></text>
-  <circle
-     style="fill:none;stroke:#000000;stroke-width:0.1"
-     d="m 17.273621,12.401574 c 0,2.690757 -2.18129,4.872047 -4.872047,4.872047 -2.6907571,0 -4.8720468,-2.18129 -4.8720468,-4.872047 0,-2.6907571 2.1812897,-4.8720468 4.8720468,-4.8720468 2.690757,0 4.872047,2.1812897 4.872047,4.8720468 z"
-     sodipodi:ry="4.8720469"
-     sodipodi:rx="4.8720469"
-     sodipodi:cy="12.401574"
-     sodipodi:cx="12.401574"
-     cx="12.401574"
-     cy="12.401574"
-     r="4.8720469"
-     id="circle3051-1"
-     transform="matrix(3.5994741,0,0,3.5902387,82.883641,109.2264)" />
   <text
      xml:space="preserve"
      style="font-size:25.35923195px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#00ffff;fill-opacity:1;stroke:none;font-family:Sans"
-     x="70.765831"
-     y="126.04791"
+     x="70.3993"
+     y="207.41858"
      id="text3098"
      sodipodi:linespacing="125%"><tspan
        sodipodi:role="line"
        id="tspan3100"
-       x="70.765831"
-       y="126.04791">RPi Power</tspan></text>
+       x="70.3993"
+       y="207.41858">RPi Power</tspan></text>
+  <rect
+     style="fill:none;stroke:#000000;stroke-width:0.08769686"
+     height="64.988853"
+     width="89.14521"
+     x="81.293022"
+     y="229.40883"
+     id="rect3084" />
 </svg>

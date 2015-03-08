@@ -34,15 +34,6 @@ use AnyEvent;
 use JSON::XS ();
 use Time::HiRes ();
 
-# TODO
-# * Start/stop logging when button pressed
-#     * Light up LED to show recording
-# * Video
-# * GPS
-# * 3-axis accelerometer
-# * Web interface for viewing pics/video
-# * Case for everything
-
 # Rpi Pins (physical, not GPIO)
 # =============================
 # 1     GPS PWR
