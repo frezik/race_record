@@ -39,9 +39,11 @@ use Time::HiRes ();
 # 1     GPS PWR
 # 2     Accelerometer PWR
 # 3     Accelerometer SDA
+# 4     Microphone PWR
 # 5     Accelerometer SCL
 # 6     Accelerometer GND
 # 8     GPS RX
+# 9     Microphone GND
 # 10    GPS TX
 # 14    GPS GND
 # 15    Start/stop switch

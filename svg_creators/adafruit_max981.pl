@@ -31,8 +31,8 @@ my $attach = Attach::Stuff->new({
     height               => 26,
     screw_default_radius => 1.25,
     screw_holes          => [
-        [ 1.5,       1.5 ],
-        [ 14 - 1.5,  1.5 ],
+        [ 2,       2 ],
+        [ 14 - 2,  2 ],
     ],
 });
 my $svg = $attach->draw;
@@ -40,8 +40,8 @@ my ($draw) = $svg->getElements( 'g' );
 
 # Microphone portion
 $draw->circle(
-    cx => $attach->mm_to_px( 7.3 ),
-    cy => $attach->mm_to_px( 7.3 ),
+    cx => $attach->mm_to_px( 7 ),
+    cy => $attach->mm_to_px( 7 ),
     r  => $attach->mm_to_px( 9.7 / 2 ),
 );
 

@@ -27,12 +27,14 @@ use warnings;
 use Attach::Stuff;
 
 my $attach = Attach::Stuff->new({
-    width                => 26,
-    height               => 34,
-    screw_default_radius => 1.25,
+    width                => 85,
+    height               => 56,
+    screw_default_radius => (2.75 / 2) + 0.25,
     screw_holes          => [
-        [ 3,       3 ],
-        [ 26 - 3,  3 ],
+        [ 3.5,      3.5      ],
+        [ 58 + 3.5, 3.5      ],
+        [ 3.5,      49 + 3.5 ],
+        [ 58 + 3.5, 49 + 3.5 ],
     ],
 });
 my $svg = $attach->draw;

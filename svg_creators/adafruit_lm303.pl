@@ -1,50 +1,42 @@
 #!perl
-use v5.20;
+# Copyright (c) 2015  Timm Murray
+# All rights reserved.
+# 
+# Redistribution and use in source and binary forms, with or without 
+# modification, are permitted provided that the following conditions are met:
+# 
+#     * Redistributions of source code must retain the above copyright notice, 
+#       this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright 
+#       notice, this list of conditions and the following disclaimer in the 
+#       documentation and/or other materials provided with the distribution.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+# POSSIBILITY OF SUCH DAMAGE.
+use v5.14;
 use warnings;
-use SVG;
-
-require 'svg_creators.pl';
-use lib './svg_creators';
+use Attach::Stuff;
 
 use constant WIDTH_MM  => 23;
 use constant HEIGHT_MM => 21;
 
-use constant SCREW_HOLE_RADIUS_MM => 1.25;
-use constant SCREW_HOLE_COORDS    => [
-    [ 2.5,            3 ],
-    [ WIDTH_MM - 2.5, 3 ],
-];
-
-
-
-my $svg = SVG->new(
-    width  => mm_to_px( WIDTH_MM ),
-    height => mm_to_px( HEIGHT_MM ),
-);
-
-my $draw = $svg->group(
-    id    => 'draw',
-    style => {
-        stroke         => 'black',
-        'stroke-width' => 0.1,
-        fill           => 'none',
-    },
-);
-
-# Draw outline
-$draw->rectangle(
-    x      => 0,
-    y      => 0,
-    width  => mm_to_px( WIDTH_MM ),
-    height => mm_to_px( HEIGHT_MM ),
-);
-
-# Draw screw holes
-$draw->circle(
-    cx => mm_to_px( $_->[0] ),
-    cy => mm_to_px( $_->[1] ),
-    r  => mm_to_px( SCREW_HOLE_RADIUS_MM ),
-) for @{ +SCREW_HOLE_COORDS };
-
-
+my $attach = Attach::Stuff->new({
+    width                => WIDTH_MM,
+    height               => HEIGHT_MM,
+    screw_default_radius => 1.25,
+    screw_holes          => [
+        [ 2.5,            3 ],
+        [ WIDTH_MM - 2.5, 3 ],
+    ],
+});
+my $svg = $attach->draw;
 print $svg->xmlify;
