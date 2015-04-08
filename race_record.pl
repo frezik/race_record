@@ -28,7 +28,7 @@ use Device::WebIO;
 use Device::WebIO::RaspberryPi;
 use GPS::NMEA;
 use Device::LSM303DLHC;
-use Getopt:Long 'GetOptions';
+use Getopt::Long 'GetOptions';
 use File::Spec 'catfile';
 use AnyEvent;
 use JSON::XS ();
@@ -46,10 +46,11 @@ use Time::HiRes ();
 # 9     Microphone GND
 # 10    GPS TX
 # 14    GPS GND
-# 15    Start/stop switch
+# 15    Start/stop switch (GPIO 22)
 # 17    Start/stop switch PWR
-# 18    Start/stop light
+# 18    Start/stop light (GPIO 24)
 # 20    Start/stop light GND
+# 39    Mic cable ground
 # 
 
 
@@ -66,15 +67,17 @@ GetOptions(
 
 
 {
-    my ($vid_fh, $data_fh, $vid_in_fh, $vid_watcher, $data_log_watcher);
+    my ($vid_fh, $data_fh, $vid_in_fh, $vid_watcher, $data_log_watcher, $json,
+        $rpi);
     sub start_record
     {
-        my ($rpi, $gps, $mag, $accel) = @_;
+        my ($rpi_arg, $gps, $mag, $accel) = @_;
+        my $rpi       = $rpi_arg;
         my $time      = time();
         my $vid_file  = catfile( $FILE_DIR, 'record_' . $time . '.h264' );
         my $data_file = catfile( $FILE_DIR, 'record_' . $time . '.json' );
 
-        my $json = JSON::XS->new;
+        $json = JSON::XS->new;
         $json->pretty( 0 );
 
         open( $vid_fh, '>', $vid_file ) or do {
@@ -87,7 +90,9 @@ GetOptions(
             return;
         };
 
-        print $data_fh "[\n" . $json->encode({ start => [gettimeofday] })
+        print $data_fh "[\n" . $json->encode({
+            start => [Time::HiRes::gettimeofday]
+        })
             . "\n";
         $vid_in_fh = $rpi->vid_stream( 0, 'video/H264' );
         my $byte_count = 0;
@@ -116,7 +121,7 @@ GetOptions(
                 my ($ns, $lat, $ew, $lon) = $gps->get_position;
                 my $mag_reading = $mag->getMagnetometerScale1;
                 my ($x, $y, $z, $wut) = $accel->getAccelerationVectorInG;
-                my $time = [gettimeofday];
+                my $time = [Time::HiRes::gettimeofday];
 
                 my $json_encoded = "," . $json->encode({
                     gps     => {
@@ -142,7 +147,7 @@ GetOptions(
                         print $data_fh $json_encoded;
                         undef $writer;
                     }
-                ):
+                );
             },
         );
 
@@ -156,7 +161,9 @@ GetOptions(
         close $vid_fh;
         close $vid_in_fh;
 
-        print $data_fh "," . $json->encode({ end => [gettimeofday] }) . "\n";
+        print $data_fh "," . $json->encode({
+            end => [ Time::HiRes::gettimeofday ]
+        }) . "\n";
         print $data_fh "]";
         close $data_fh;
 
