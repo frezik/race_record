@@ -26,13 +26,15 @@ use v5.14;
 use warnings;
 use Device::WebIO;
 use Device::WebIO::RaspberryPi;
-use GPS::NMEA;
 use Device::LSM303DLHC;
 use Getopt::Long 'GetOptions';
 use File::Spec 'catfile';
 use AnyEvent;
 use JSON::XS ();
 use Time::HiRes ();
+
+use lib 'lib';
+use LocalGPSNMEA;
 
 # Rpi Pins (physical, not GPIO)
 # =============================
@@ -54,7 +56,7 @@ use Time::HiRes ();
 # 
 
 
-my $GPS_DEV     = '/dev/ttyS0';
+my $GPS_DEV     = '/dev/ttyAMA0';
 my $GPS_BAUD    = 9600;
 my $FILE_DIR    = '/tmp';
 my $RECORD_TIME = 0.1;
@@ -119,6 +121,7 @@ GetOptions(
             interval => $RECORD_TIME,
             cb       => sub {
                 my ($ns, $lat, $ew, $lon) = $gps->get_position;
+                my $velocity_kph = $gps->get_velocity;
                 my $mag_reading = $mag->getMagnetometerScale1;
                 my ($x, $y, $z, $wut) = $accel->getAccelerationVectorInG;
                 my $time = [Time::HiRes::gettimeofday];
@@ -129,6 +132,7 @@ GetOptions(
                         ew   => $ew,
                         lat  => $lat,
                         long => $lon,
+                        kph  => $velocity_kph,
                     },
                     accel   => {
                         x   => $x,
@@ -175,7 +179,7 @@ GetOptions(
 {
     my $rpi = Device::WebIO::RaspberryPi->new;
 
-    my $gps = GPS::NMEA->new(
+    my $gps = LocalGPSNMEA->new(
         Port => $GPS_DEV,
         Baud => $GPS_BAUD,
     );
