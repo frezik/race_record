@@ -28,7 +28,7 @@ use Device::WebIO;
 use Device::WebIO::RaspberryPi;
 use Device::LSM303DLHC;
 use Getopt::Long 'GetOptions';
-use File::Spec 'catfile';
+use File::Spec;
 use AnyEvent;
 use JSON::XS ();
 use Time::HiRes ();
@@ -55,6 +55,8 @@ use LocalGPSNMEA;
 # 39    Mic cable ground
 # 
 
+use constant DEBUG => 1;
+
 
 my $GPS_DEV     = '/dev/ttyAMA0';
 my $GPS_BAUD    = 9600;
@@ -74,10 +76,12 @@ GetOptions(
     sub start_record
     {
         my ($rpi_arg, $gps, $mag, $accel) = @_;
-        my $rpi       = $rpi_arg;
+        $rpi          = $rpi_arg;
         my $time      = time();
-        my $vid_file  = catfile( $FILE_DIR, 'record_' . $time . '.h264' );
-        my $data_file = catfile( $FILE_DIR, 'record_' . $time . '.json' );
+        my $vid_file  = File::Spec->catfile( $FILE_DIR, 'record_' . $time
+            . '.h264' );
+        my $data_file = File::Spec->catfile( $FILE_DIR, 'record_' . $time
+            . '.json' );
 
         $json = JSON::XS->new;
         $json->pretty( 0 );
@@ -122,7 +126,7 @@ GetOptions(
             cb       => sub {
                 my ($ns, $lat, $ew, $lon) = $gps->get_position;
                 my $velocity_kph = $gps->get_velocity;
-                my $mag_reading = $mag->getMagnetometerScale1;
+                #my $mag_reading = $mag->getMagnetometerScale1;
                 my ($x, $y, $z, $wut) = $accel->getAccelerationVectorInG;
                 my $time = [Time::HiRes::gettimeofday];
 
@@ -140,7 +144,7 @@ GetOptions(
                         z   => $z,
                         wut => $wut
                     },
-                    magneto => $mag_reading,
+                    #magneto => $mag_reading,
                     time    => $time,
                 }) . "\n";
 
@@ -160,6 +164,8 @@ GetOptions(
 
     sub stop_record
     {
+        $rpi->output_pin( $LED_PIN, 0 );
+
         undef $vid_watcher;
         undef $data_log_watcher;
         close $vid_fh;
@@ -170,8 +176,6 @@ GetOptions(
         }) . "\n";
         print $data_fh "]";
         close $data_fh;
-
-        $rpi->output_pin( $LED_PIN, 1 );
     }
 }
 
@@ -206,10 +210,12 @@ GetOptions(
             if( $input && !$is_last_input_on ) {
                 # Button was just pressed, so start or stop recording
                 if( $is_now_recording ) {
-                    stop_record();
+                    say "Stop recording" if DEBUG;
+                    eval { stop_record() };
                     $is_now_recording = 0;
                 }
                 else {
+                    say "Start recording" if DEBUG;
                     start_record( $rpi, $gps, $mag, $accel );
                     $is_now_recording = 1;
                 }
@@ -220,6 +226,7 @@ GetOptions(
         },
     );
 
+    say "Ready" if DEBUG;
     my $cv = AnyEvent->condvar;
     $cv->recv;
 }
