@@ -28,7 +28,7 @@ use Device::WebIO;
 use Device::WebIO::RaspberryPi;
 use Device::LSM303DLHC;
 use Getopt::Long 'GetOptions';
-use File::Spec 'catfile';
+use File::Spec;
 use AnyEvent;
 use JSON::XS ();
 use Time::HiRes ();
@@ -72,10 +72,12 @@ GetOptions(
     sub start_record
     {
         my ($rpi_arg, $gps, $mag, $accel) = @_;
-        my $rpi       = $rpi_arg;
+        $rpi          = $rpi_arg;
         my $time      = time();
-        my $vid_file  = catfile( $FILE_DIR, 'record_' . $time . '.h264' );
-        my $data_file = catfile( $FILE_DIR, 'record_' . $time . '.json' );
+        my $vid_file  = File::Spec->catfile( $FILE_DIR, 'record_' . $time
+            . '.h264' );
+        my $data_file = File::Spec->catfile( $FILE_DIR, 'record_' . $time
+            . '.json' );
 
         $json = JSON::XS->new;
         $json->pretty( 0 );
@@ -218,6 +220,7 @@ GetOptions(
         },
     );
 
+    say "Ready";
     my $cv = AnyEvent->condvar;
     $cv->recv;
 }
