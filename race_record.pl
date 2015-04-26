@@ -29,6 +29,7 @@ use Device::WebIO::RaspberryPi;
 use Device::LSM303DLHC;
 use Getopt::Long 'GetOptions';
 use File::Spec;
+use EV ();
 use AnyEvent;
 use JSON::XS ();
 use Time::HiRes ();
@@ -58,7 +59,7 @@ use constant DEBUG => 1;
 
 my $GPS_DEV     = '/dev/ttyAMA0';
 my $GPS_BAUD    = 9600;
-my $FILE_DIR    = '/tmp';
+my $FILE_DIR    = 'public';
 my $RECORD_TIME = 0.1;
 my $SWITCH_PIN  = 22;
 my $LED_PIN     = 24;
@@ -80,6 +81,8 @@ GetOptions(
             . '.h264' );
         my $data_file = File::Spec->catfile( $FILE_DIR, 'record_' . $time
             . '.json' );
+        say "Writing vid to $vid_file"   if DEBUG;
+        say "Writing data to $data_file" if DEBUG;
 
         $json = JSON::XS->new;
         $json->pretty( 0 );
@@ -125,7 +128,7 @@ GetOptions(
                 my ($ns, $lat, $ew, $lon) = $gps->get_position;
                 my $velocity_kph = $gps->get_velocity;
                 #my $mag_reading = $mag->getMagnetometerScale1;
-                my ($x, $y, $z, $wut) = $accel->getAccelerationVectorInG;
+                my $accl_reading = $accel->getAccelerationVectorInG;
                 my $time = [Time::HiRes::gettimeofday];
 
                 my $json_encoded = "," . $json->encode({
@@ -136,12 +139,7 @@ GetOptions(
                         long => $lon,
                         kph  => $velocity_kph,
                     },
-                    accel   => {
-                        x   => $x,
-                        y   => $y,
-                        z   => $z,
-                        wut => $wut
-                    },
+                    accel   => $accl_reading,
                     #magneto => $mag_reading,
                     time    => $time,
                 }) . "\n";
