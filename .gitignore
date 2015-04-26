@@ -1,3 +1,4 @@
 *.svg
 !caseplans.svg
 public/*
+local
