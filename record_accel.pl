@@ -2,6 +2,7 @@
 use v5.14;
 use warnings;
 use Device::LSM303DLHC;
+use Time::HiRes ();
 use Getopt::Long ();
 use lib 'lib';
 use LocalJSONStream ();
