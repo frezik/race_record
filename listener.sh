@@ -1,7 +1,7 @@
 #!/bin/bash
 SWITCH_PIN=22
 LED_PIN=24
-OUTPUT_DIR="public/"
+OUTPUT_DIR="public"
 
 gpio -g mode ${SWITCH_PIN} in
 gpio -g mode ${LED_PIN} out
@@ -17,8 +17,8 @@ do
     # Launch data recording programs
     #./record_video.pl --vid-file="${FILE_PREFIX}.avi" --data-file="${FILE_PREFIX}_vid_data.json" &
     #VID_PID=$!
-    #./record_gps.pl --data-file="${FILE_PREFIX}_gps_data.json" &
-    #GPS_PID=$!
+    ./record_gps.pl --data-file="${FILE_PREFIX}_gps_data.json" &
+    GPS_PID=$!
     ./record_accel.pl --data-file="${FILE_PREFIX}_accel_data.json" &
     ACCEL_PID=$!
 
@@ -31,7 +31,7 @@ do
     gpio -g wfi ${SWITCH_PIN} falling
     # Kill data recording programs
     #kill ${VID_PID}
-    #kill ${GPS_PID}
+    kill ${GPS_PID}
     kill ${ACCEL_PID}
     # Turn off LED
     gpio -g write ${LED_PIN} 0

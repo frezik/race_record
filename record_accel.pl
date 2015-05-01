@@ -33,5 +33,8 @@ $accel->enable;
 
 while(1) {
     my $accel = $accel->getAccelerationVectorInG;
-    print $out $json->output( $accel );
+    print $out $json->output({
+        time => [Time::HiRes::gettimeofday],
+        %$accel,
+    });
 }
