@@ -1,0 +1,15 @@
+Rpi Pins (physical, not GPIO)
+=============================
+1     GPS PWR
+2     Accelerometer PWR
+3     Accelerometer SDA
+5     Accelerometer SCL
+6     Accelerometer GND
+8     GPS RX
+10    GPS TX
+14    GPS GND
+15    Start/stop switch (GPIO 22)
+17    Start/stop switch PWR
+18    Start/stop light (GPIO 24)
+20    Start/stop light GND
+39    Mic cable ground
