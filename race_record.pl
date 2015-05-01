@@ -37,25 +37,6 @@ use Time::HiRes ();
 use lib 'lib';
 use LocalGPSNMEA;
 
-# Rpi Pins (physical, not GPIO)
-# =============================
-# 1     GPS PWR
-# 2     Accelerometer PWR
-# 3     Accelerometer SDA
-# 4     Microphone PWR
-# 5     Accelerometer SCL
-# 6     Accelerometer GND
-# 8     GPS RX
-# 9     Microphone GND
-# 10    GPS TX
-# 14    GPS GND
-# 15    Start/stop switch (GPIO 22)
-# 17    Start/stop switch PWR
-# 18    Start/stop light (GPIO 24)
-# 20    Start/stop light GND
-# 39    Mic cable ground
-# 
-
 use constant DEBUG => 1;
 
 
@@ -65,15 +46,31 @@ my $FILE_DIR    = 'public';
 my $RECORD_TIME = 0.1;
 my $SWITCH_PIN  = 22;
 my $LED_PIN     = 24;
+my $WIDTH    = 1024;
+my $HEIGHT   = 768;
+my $BITRATE  = 2000;
+my $TYPE     = 'avi';
 GetOptions(
     'gps-dev=s'   => \$GPS_DEV,
     'record-to=s' => \$FILE_DIR,
+    'width=i'     => \$WIDTH,
+    'height=i'    => \$HEIGHT,
+    'bitrate=i'   => \$BITRATE,
+    'type=s'      => \$TYPE,
 );
+
+my %TYPE_LOOKUP = (
+    avi  => 'video/x-msvideo',
+    h264 => 'video/H264',
+    #mp4  => 'video/mp4',
+);
+$TYPE = lc $TYPE;
+die "Type '$TYPE' is not supported\n" if ! exists $TYPE_LOOKUP{$TYPE};
+my $MIME_TYPE = $TYPE_LOOKUP{$TYPE};
 
 
 {
-    my ($vid_fh, $data_fh, $vid_in_fh, $vid_watcher, $data_log_watcher, $json,
-        $rpi);
+    my ($vid_fh, $data_fh, $vid_in_fh, $data_log_watcher, $json, $rpi);
     sub start_record
     {
         my ($rpi_arg, $gps, $mag, $accel) = @_;
@@ -103,25 +100,19 @@ GetOptions(
             start => [Time::HiRes::gettimeofday]
         })
             . "\n";
-        $vid_in_fh = $rpi->vid_stream( 0, 'video/H264' );
-        my $byte_count = 0;
-        $vid_watcher = AnyEvent->io(
-            fh   => $vid_in_fh,
-            poll => 'r',
-            cb   => sub {
-                my $in_bytes = read( $vid_in_fh, my $buf, 1024 * 64 );
-                $byte_count += $in_bytes;
-
-                my $writer; $writer = AnyEvent->io(
-                    fh   => $vid_fh,
-                    poll => 'w',
-                    cb   => sub {
-                        print $vid_fh $buf;
-                        undef $writer;
-                    },
-                );
-            },
-        );
+        $rpi->vid_stream_callback( 0, $MIME_TYPE, sub {
+            my ($frame) = @_;
+            my $buf = pack( 'C*', @$frame );
+            my $writer; $writer = AnyEvent->io(
+                fh   => $vid_fh,
+                poll => 'w',
+                cb   => sub {
+                    print $vid_fh $buf;
+                    undef $writer;
+                },
+            );
+            return 1;
+        });
 
         $data_log_watcher = AnyEvent->timer(
             after    => 0.1,
@@ -162,9 +153,9 @@ GetOptions(
 
     sub stop_record
     {
+        my ($cv) = @_;
         $rpi->output_pin( $LED_PIN, 0 );
 
-        undef $vid_watcher;
         undef $data_log_watcher;
         close $vid_fh;
         close $vid_in_fh;
@@ -174,12 +165,18 @@ GetOptions(
         }) . "\n";
         print $data_fh "]";
         close $data_fh;
+
+        $cv->send;
     }
 }
 
 
 {
-    my $rpi = Device::WebIO::RaspberryPi->new;
+    my $cv = AnyEvent->condvar;
+    my $rpi = Device::WebIO::RaspberryPi->new({
+        vid_use_audio => 1,
+        cv            => $cv,
+    });
 
     my $gps = LocalGPSNMEA->new(
         Port => $GPS_DEV,
@@ -197,6 +194,10 @@ GetOptions(
     $rpi->set_as_output( $LED_PIN );
     $rpi->output_pin( $LED_PIN, 0 );
 
+    $rpi->vid_set_width(  0, $WIDTH );
+    $rpi->vid_set_height( 0, $HEIGHT );
+    $rpi->vid_set_kbps(   0, $BITRATE );
+
     # Keep track of toggle switch
     my $is_last_input_on = 0;
     my $is_now_recording = 0;
@@ -209,7 +210,7 @@ GetOptions(
                 # Button was just pressed, so start or stop recording
                 if( $is_now_recording ) {
                     say "Stop recording" if DEBUG;
-                    eval { stop_record() };
+                    eval { stop_record( $cv ) };
                     $is_now_recording = 0;
                 }
                 else {
@@ -225,6 +226,8 @@ GetOptions(
     );
 
     say "Ready" if DEBUG;
-    my $cv = AnyEvent->condvar;
-    $cv->recv;
+    while( 1 ) {
+        $cv->recv;
+        $rpi->vid_stream_begin_loop( 0 );
+    }
 }
