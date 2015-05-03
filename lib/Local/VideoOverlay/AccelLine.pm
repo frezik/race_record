@@ -42,6 +42,17 @@ sub draw_accel
         ymax   => $line_y + 1,
     );
 
+    $self->_draw_accel_indicator_line( $img, $line_size, $accel_value,
+        $max_accel_value, $accel_color, $line_y, $center_x);
+
+    return 1;
+}
+
+sub _draw_accel_indicator_line
+{
+    my ($self, $img, $line_size, $accel_value, $max_accel_value, $accel_color,
+        $line_y, $center_x) = @_;
+
     my $line_half_width = $line_size / 2;
     my $accel_fraction = $accel_value / $max_accel_value;
     my $indicator_x = $center_x + ($line_half_width * $accel_fraction);
