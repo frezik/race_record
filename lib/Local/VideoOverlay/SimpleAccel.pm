@@ -28,14 +28,13 @@ use Moose;
 use namespace::autoclean;
 
 with 'Local::VideoOverlay';
-
-use constant DEBUG => 1;
+with 'Local::VideoOverlay::AccelLine';
 
 use constant ACCEL_PERCENT_WIDTH           => 22;
 use constant ACCEL_POSITION_HEIGHT_PERCENT => 90;
-use constant ACCEL_COLOR_R                 => 237;
-use constant ACCEL_COLOR_B                 => 31;
-use constant ACCEL_COLOR_G                 => 141;
+use constant ACCEL_COLOR_R                 => 235;
+use constant ACCEL_COLOR_G                 => 111;
+use constant ACCEL_COLOR_B                 => 23;
 use constant OVERLAY_BACKGROUND_COLOR_R    => 216;
 use constant OVERLAY_BACKGROUND_COLOR_G    => 216;
 use constant OVERLAY_BACKGROUND_COLOR_B    => 199;
@@ -49,49 +48,20 @@ sub make_frame
     my $accel_x = $self->accel_x;
     my $img     = $self->_init_img( $width, $height );
 
-    my $center_x     = int( $width / 2 );
-    my $line_size    = int( $width * (ACCEL_PERCENT_WIDTH / 100) );
-    my $line_start_x = $center_x - ($line_size / 2);
-    my $line_end_x   = $line_start_x + $line_size;
-    my $line_y       = int( $height * (ACCEL_POSITION_HEIGHT_PERCENT / 100) );
-    say "Drawing at ($line_start_x, $line_y) to ($line_end_x, $line_y)" if DEBUG;
-
-    my $overlay_background_color = Imager::Color->new(
-        OVERLAY_BACKGROUND_COLOR_R, OVERLAY_BACKGROUND_COLOR_G,
-        OVERLAY_BACKGROUND_COLOR_B, 0xFF );
-    $img->box(
-        color  => $overlay_background_color,
-        filled => 1,
-        xmin   => $line_start_x - 2,
-        # TODO height as a percentage of image size
-        ymin   => $line_y - 9,
-        xmax   => $line_end_x + 2,
-        ymax   => $line_y + 2,
-    );
-    my $accel_color = Imager::Color->new(
-        ACCEL_COLOR_R, ACCEL_COLOR_G, ACCEL_COLOR_B, 0xFF );
-    $img->box(
-        color  => $accel_color,
-        filled => 1,
-        xmin   => $line_start_x,
-        # TODO thickness (height) as a percentage of image size
-        ymin   => $line_y - 1,
-        xmax   => $line_end_x,
-        ymax   => $line_y + 1,
-    );
-
-    my $line_half_width = $line_size / 2;
-    # TODO calculate accel as a percentage of max accel
-    my $indicator_x = $center_x + ($line_half_width * $accel_x);
-    say "Drawing indicator at ($indicator_x, $line_y)" if DEBUG;
-    $img->line(
-        color => $accel_color,
-        x1    => $indicator_x,
-        y1    => $line_y,
-        x2    => $indicator_x,
-        # TODO height as a percentage of image size
-        y2    => $line_y - 7,
-    );
+    my $accel_color = Imager::Color->new( ACCEL_COLOR_R, ACCEL_COLOR_G,
+        ACCEL_COLOR_B, 255 );
+    my $bg_color    = Imager::Color->new( OVERLAY_BACKGROUND_COLOR_R,
+        OVERLAY_BACKGROUND_COLOR_G, OVERLAY_BACKGROUND_COLOR_B, 127 );
+    $self->draw_accel({
+        width                         => $width,
+        height                        => $height,
+        accel_value                   => $accel_x,
+        accel_percent_width           => ACCEL_PERCENT_WIDTH,
+        accel_position_height_percent => ACCEL_POSITION_HEIGHT_PERCENT,
+        accel_color                   => $accel_color,
+        bg_color                      => $bg_color,
+        img                           => $img,
+    });
 
     return $img;
 }
