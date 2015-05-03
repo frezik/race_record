@@ -14,6 +14,7 @@ sub draw_accel
     my $accel_percent_width           = $args->{accel_percent_width};
     my $accel_position_height_percent = $args->{accel_position_height_percent};
     my $accel_color                   = $args->{accel_color};
+    my $accel_indicator_color         = $args->{accel_indicator_color};
     my $bg_color                      = $args->{bg_color};
     my $img                           = $args->{img};
 
@@ -30,7 +31,7 @@ sub draw_accel
         # TODO height as a percentage of image size
         ymin   => $line_y - 9,
         xmax   => $line_end_x + 2,
-        ymax   => $line_y + 2,
+        ymax   => $line_y + 9,
     );
     $img->box(
         color  => $accel_color,
@@ -42,8 +43,16 @@ sub draw_accel
         ymax   => $line_y + 1,
     );
 
-    $self->_draw_accel_indicator_line( $img, $line_size, $accel_value,
+    # Draw scale lines
+    $self->_draw_accel_indicator_line( $img, $line_size, $max_accel_value,
         $max_accel_value, $accel_color, $line_y, $center_x);
+    $self->_draw_accel_indicator_line( $img, $line_size, 0,
+        $max_accel_value, $accel_color, $line_y, $center_x);
+    $self->_draw_accel_indicator_line( $img, $line_size, -$max_accel_value,
+        $max_accel_value, $accel_color, $line_y, $center_x);
+
+    $self->_draw_accel_indicator_line( $img, $line_size, $accel_value,
+        $max_accel_value, $accel_indicator_color, $line_y, $center_x);
 
     return 1;
 }
@@ -59,7 +68,7 @@ sub _draw_accel_indicator_line
     $img->line(
         color => $accel_color,
         x1    => $indicator_x,
-        y1    => $line_y,
+        y1    => $line_y + 7,
         x2    => $indicator_x,
         # TODO height as a percentage of image size
         y2    => $line_y - 7,

@@ -32,9 +32,14 @@ with 'Local::VideoOverlay::AccelLine';
 
 use constant ACCEL_PERCENT_WIDTH           => 22;
 use constant ACCEL_POSITION_HEIGHT_PERCENT => 90;
-use constant ACCEL_COLOR_R                 => 235;
-use constant ACCEL_COLOR_G                 => 111;
-use constant ACCEL_COLOR_B                 => 23;
+# Colors from:
+# http://colorschemedesigner.com/csd-3.5/#3C11Tw0w0w0w0
+use constant ACCEL_COLOR_R                 => 0x0E;
+use constant ACCEL_COLOR_G                 => 0x53;
+use constant ACCEL_COLOR_B                 => 0xA7;
+use constant ACCEL_INDICATOR_COLOR_R       => 0x68;
+use constant ACCEL_INDICATOR_COLOR_G       => 0x99;
+use constant ACCEL_INDICATOR_COLOR_B       => 0xD3;
 use constant OVERLAY_BACKGROUND_COLOR_R    => 216;
 use constant OVERLAY_BACKGROUND_COLOR_G    => 216;
 use constant OVERLAY_BACKGROUND_COLOR_B    => 199;
@@ -51,6 +56,8 @@ sub make_frame
 
     my $accel_color = Imager::Color->new( ACCEL_COLOR_R, ACCEL_COLOR_G,
         ACCEL_COLOR_B, 255 );
+    my $accel_indicator_color = Imager::Color->new( ACCEL_INDICATOR_COLOR_R,
+        ACCEL_INDICATOR_COLOR_G, ACCEL_INDICATOR_COLOR_B, 255 );
     my $bg_color    = Imager::Color->new( OVERLAY_BACKGROUND_COLOR_R,
         OVERLAY_BACKGROUND_COLOR_G, OVERLAY_BACKGROUND_COLOR_B, 127 );
     $self->draw_accel({
@@ -61,6 +68,7 @@ sub make_frame
         accel_percent_width           => ACCEL_PERCENT_WIDTH,
         accel_position_height_percent => ACCEL_POSITION_HEIGHT_PERCENT,
         accel_color                   => $accel_color,
+        accel_indicator_color         => $accel_indicator_color,
         bg_color                      => $bg_color,
         img                           => $img,
     });
