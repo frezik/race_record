@@ -97,5 +97,10 @@ $muxer->link( $sink );
 
 $pipeline->set_state( "playing" );
 print $out $json->start;
+print $out $json->output({
+    width  => $WIDTH,
+    height => $HEIGHT,
+    fps    => $FPS,
+});
 Gtk2->main;
 $pipeline->set_state( "null" );
