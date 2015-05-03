@@ -63,6 +63,7 @@ sub make_frame
         color  => $overlay_background_color,
         filled => 1,
         xmin   => $line_start_x - 2,
+        # TODO height as a percentage of image size
         ymin   => $line_y - 9,
         xmax   => $line_end_x + 2,
         ymax   => $line_y + 2,
@@ -73,12 +74,14 @@ sub make_frame
         color  => $accel_color,
         filled => 1,
         xmin   => $line_start_x,
+        # TODO thickness (height) as a percentage of image size
         ymin   => $line_y - 1,
         xmax   => $line_end_x,
         ymax   => $line_y + 1,
     );
 
     my $line_half_width = $line_size / 2;
+    # TODO calculate accel as a percentage of max accel
     my $indicator_x = $center_x + ($line_half_width * $accel_x);
     say "Drawing indicator at ($indicator_x, $line_y)" if DEBUG;
     $img->line(
@@ -86,6 +89,7 @@ sub make_frame
         x1    => $indicator_x,
         y1    => $line_y,
         x2    => $indicator_x,
+        # TODO height as a percentage of image size
         y2    => $line_y - 7,
     );
 
