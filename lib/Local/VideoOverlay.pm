@@ -53,6 +53,21 @@ has accel_z => (
     isa      => 'Num',
     required => 1,
 );
+has max_accel_x => (
+    is       => 'ro',
+    isa      => 'Num',
+    required => 1,
+);
+has max_accel_y => (
+    is       => 'ro',
+    isa      => 'Num',
+    required => 1,
+);
+has max_accel_z => (
+    is       => 'ro',
+    isa      => 'Num',
+    required => 1,
+);
 has gps_lat => (
     is       => 'ro',
     isa      => 'Num',

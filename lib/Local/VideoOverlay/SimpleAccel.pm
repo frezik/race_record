@@ -43,10 +43,11 @@ use constant OVERLAY_BACKGROUND_COLOR_B    => 199;
 sub make_frame
 {
     my ($self)  = @_;
-    my $width   = $self->width;
-    my $height  = $self->height;
-    my $accel_x = $self->accel_x;
-    my $img     = $self->_init_img( $width, $height );
+    my $width       = $self->width;
+    my $height      = $self->height;
+    my $accel_x     = $self->accel_x;
+    my $max_accel_x = $self->max_accel_x;
+    my $img         = $self->_init_img( $width, $height );
 
     my $accel_color = Imager::Color->new( ACCEL_COLOR_R, ACCEL_COLOR_G,
         ACCEL_COLOR_B, 255 );
@@ -56,6 +57,7 @@ sub make_frame
         width                         => $width,
         height                        => $height,
         accel_value                   => $accel_x,
+        max_accel_value               => $max_accel_x,
         accel_percent_width           => ACCEL_PERCENT_WIDTH,
         accel_position_height_percent => ACCEL_POSITION_HEIGHT_PERCENT,
         accel_color                   => $accel_color,

@@ -10,6 +10,7 @@ sub draw_accel
     my $width                         = $args->{width};
     my $height                        = $args->{height};
     my $accel_value                   = $args->{accel_value};
+    my $max_accel_value               = $args->{max_accel_value};
     my $accel_percent_width           = $args->{accel_percent_width};
     my $accel_position_height_percent = $args->{accel_position_height_percent};
     my $accel_color                   = $args->{accel_color};
@@ -42,8 +43,8 @@ sub draw_accel
     );
 
     my $line_half_width = $line_size / 2;
-    # TODO calculate accel as a percentage of max accel
-    my $indicator_x = $center_x + ($line_half_width * $accel_value);
+    my $accel_fraction = $accel_value / $max_accel_value;
+    my $indicator_x = $center_x + ($line_half_width * $accel_fraction);
     $img->line(
         color => $accel_color,
         x1    => $indicator_x,
