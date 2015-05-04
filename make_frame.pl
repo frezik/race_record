@@ -25,12 +25,12 @@
 use v5.20;
 use warnings;
 use lib 'lib';
-use Local::VideoOverlay::SimpleAccel;
+use Local::VideoOverlay::FullOverlay;
 
 
 my $OUT_FILE = shift or die "Need output file\n";
 
-my $over = Local::VideoOverlay::SimpleAccel->new({
+my $over = Local::VideoOverlay::FullOverlay->new({
     width       => 800,
     height      => 600,
     accel_x     => -0.25,
