@@ -17,6 +17,7 @@ sub draw_accel
     my $accel_indicator_color         = $args->{accel_indicator_color};
     my $bg_color                      = $args->{bg_color};
     my $img                           = $args->{img};
+    my $font                          = $args->{font};
 
     my $center_x     = int( $width / 2 );
     my $line_size    = int( $width * ($accel_percent_width / 100) );
@@ -24,14 +25,16 @@ sub draw_accel
     my $line_end_x   = $line_start_x + $line_size;
     my $line_y       = int( $height * ($accel_position_height_percent / 100) );
 
+    my $font_size = 15;
+
     $img->box(
         color  => $bg_color,
         filled => 1,
-        xmin   => $line_start_x - 2,
+        xmin   => $line_start_x - $font_size - 2,
         # TODO height as a percentage of image size
         ymin   => $line_y - 9,
-        xmax   => $line_end_x + 2,
-        ymax   => $line_y + 9,
+        xmax   => $line_end_x + $font_size + 2,
+        ymax   => $line_y + $font_size + 9,
     );
     $img->box(
         color  => $accel_color,
@@ -45,14 +48,17 @@ sub draw_accel
 
     # Draw scale lines
     $self->_draw_accel_indicator_line( $img, $line_size, $max_accel_value,
-        $max_accel_value, $accel_color, $line_y, $center_x);
+        $max_accel_value, $accel_color, $line_y, $center_x,
+        1, $font, $font_size, $accel_color);
     $self->_draw_accel_indicator_line( $img, $line_size, 0,
-        $max_accel_value, $accel_color, $line_y, $center_x);
+        $max_accel_value, $accel_color, $line_y, $center_x,
+        1, $font, $font_size, $accel_color);
     $self->_draw_accel_indicator_line( $img, $line_size, -$max_accel_value,
-        $max_accel_value, $accel_color, $line_y, $center_x);
+        $max_accel_value, $accel_color, $line_y, $center_x,
+        1, $font, $font_size, $accel_color);
 
     $self->_draw_accel_indicator_line( $img, $line_size, $accel_value,
-        $max_accel_value, $accel_indicator_color, $line_y, $center_x);
+        $max_accel_value, $accel_indicator_color, $line_y, $center_x, 0);
 
     return 1;
 }
@@ -60,7 +66,7 @@ sub draw_accel
 sub _draw_accel_indicator_line
 {
     my ($self, $img, $line_size, $accel_value, $max_accel_value, $accel_color,
-        $line_y, $center_x) = @_;
+        $line_y, $center_x, $write_value_str, $font, $font_size, $font_color)= @_;
 
     my $line_half_width = $line_size / 2;
     my $accel_fraction = $accel_value / $max_accel_value;
@@ -73,6 +79,19 @@ sub _draw_accel_indicator_line
         # TODO height as a percentage of image size
         y2    => $line_y - 7,
     );
+
+    if( $write_value_str ) {
+        $img->align_string(
+            x      => $indicator_x,
+            y      => $line_y + $font_size + 2,
+            string => $accel_value . 'g',
+            font   => $font,
+            size   => $font_size,
+            color  => $font_color,
+            halign => 'center',
+            valign => 'bottom',
+        );
+    }
 
     return 1;
 }
