@@ -79,15 +79,30 @@ sub fill_timeline
     return 1;
 }
 
-sub get_start_time
+sub parse_vid_data
 {
     my ($vid) = @_;
-    return $vid->[0]{start};
+    my $start_time = $vid->[0]{start};
+    my $width      = $vid->[1]{width};
+    my $height     = $vid->[1]{height};
+    my $fps        = $vid->[1]{fps};
+    my $end_time   = $vid->[2]{end};
+    return ($start_time, $end_time, $width, $height, $fps);
 }
 
 sub create_overlay_pngs
 {
-    my ($tmp_dir, $timeline, $start_time) = @_;
+    my ($tmp_dir, $timeline, $start_time, $end_time, $fps) = @_;
+    my $iter = $timeline->get_iterator( $start_time, $end_time, 1 / $fps );
+
+    my $data = $iter->();
+    my $frame_index = '00000000';
+    while(defined $data) {
+        my $time = $data->{time};
+        say "Writing frame $frame_index at time $$time[0],$$time[1]";
+        $data = $iter->();
+        $frame_index = sprintf( '%08d', $frame_index + 1 );
+    }
     return 1;
 }
 
@@ -114,7 +129,9 @@ sub decode_json_file
     my $timeline = Local::VideoOverlay::Timeline->new;
     fill_timeline( $timeline, $accel_json, $gps_json );
     my $tmp_dir = File::Temp::tempdir( CLEANUP => 1 );
-    my $start_time = get_start_time( $vid_json );
-    say "Starting at $$start_time[0].$$start_time[1]";
-    create_overlay_pngs( $tmp_dir, $timeline, $start_time );
+    my ($start_time, $end_time, $width, $height, $fps)
+        = parse_vid_data( $vid_json );
+    say "Starting at $$start_time[0],$$start_time[1]";
+    say "Writing to $tmp_dir";
+    create_overlay_pngs( $tmp_dir, $timeline, $start_time, $end_time, $fps );
 }
