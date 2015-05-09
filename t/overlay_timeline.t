@@ -21,7 +21,7 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-use Test::More tests => 5;
+use Test::More tests => 6;
 use v5.14;
 use Test::Differences::Color;
 use lib 'lib';
@@ -84,7 +84,7 @@ $time->add({
 });
 
 
-my $iter = $time->get_iterator( [ 0, 200 ], 1 / 30 );
+my $iter = $time->get_iterator( [ 0, 200 ], [ 0, 100199 ], 1 / 30 );
 eq_or_diff( $iter->(), {
     accel => {
         x => 0.2,
@@ -145,3 +145,4 @@ eq_or_diff( $iter->(), {
     },
     time => [ 0, 100199 ],
 });
+ok(! defined $iter->(), "End of timeline" );

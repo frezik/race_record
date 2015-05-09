@@ -42,7 +42,7 @@ sub add
 
 sub get_iterator
 {
-    my ($self, $start_time, $sec_per_frame) = @_;
+    my ($self, $start_time, $end_time, $sec_per_frame) = @_;
     my ($start_sec, $start_msec) = (@$start_time);
     my $msec_per_frame = sprintf( '%.0f', 1_000_000 * $sec_per_frame );
 
@@ -71,6 +71,9 @@ sub get_iterator
     }
 
     my $iter = sub {
+        return undef
+            if ($start_sec >= $end_time->[0]) && ($start_msec > $end_time->[1]);
+
         my $ret = {
             accel => $accel[$i_accel]{accel},
             gps   => $gps[$i_gps]{gps},
