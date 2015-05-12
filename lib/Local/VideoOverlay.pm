@@ -75,7 +75,7 @@ has gps_lat => (
 );
 has gps_lat_ns => (
     is       => 'ro',
-    isa      => Moose::enum([qw{ n s }]),
+    isa      => Moose::enum([qw{ n s N S }]),
     required => 1,
 );
 has gps_long => (
@@ -85,7 +85,7 @@ has gps_long => (
 );
 has gps_long_ew => (
     is       => 'ro',
-    isa      => Moose::enum([qw{ e w }]),
+    isa      => Moose::enum([qw{ e w E W }]),
     required => 1,
 );
 has gps_kph => (

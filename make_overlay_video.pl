@@ -26,6 +26,8 @@ use v5.14;
 use Getopt::Long ();
 use JSON::XS ();
 use File::Temp ();
+use File::Copy ();
+use Cwd ();
 use lib 'lib';
 use Local::VideoOverlay::Timeline;
 use Local::VideoOverlay::FullOverlay;
@@ -33,17 +35,22 @@ use Local::VideoOverlay::FullOverlay;
 my $ACCEL_JSON = '';
 my $GPS_JSON   = '';
 my $VID_JSON   = '';
+my $OUTPUT     = '';
 Getopt::Long::GetOptions(
     'accel-json=s' => \$ACCEL_JSON,
     'gps-json=s'   => \$GPS_JSON,
     'vid-json=s'   => \$VID_JSON,
+    'output=s'     => \$OUTPUT,
 );
-help() and exit(0) if !$ACCEL_JSON && !$GPS_JSON && !$VID_JSON;
+help() and exit(0) if !$ACCEL_JSON && !$GPS_JSON && !$VID_JSON && !$OUTPUT;
+help() and exit(0) if $OUTPUT !~ /\.mov\z/;
 
 
 sub help
 {
-    say "Usage: $0 --accel-json=<FILE> --gps-json=<FILE> --vid-json=<FILE>";
+    say "Usage: $0 --accel-json=<FILE> --gps-json=<FILE> --vid-json=<FILE> -o <FILE>";
+    say "";
+    say "The file for -o must have .mov extension";
     return 1;
 }
 
@@ -62,7 +69,7 @@ sub fill_timeline
                 map {
                     $_ eq 'time'
                         ? ()
-                        : $timepoint{$_}
+                        : ($_ => $timepoint{$_})
                 } keys %timepoint,
             };
 
@@ -92,14 +99,38 @@ sub parse_vid_data
 
 sub create_overlay_pngs
 {
-    my ($tmp_dir, $timeline, $start_time, $end_time, $fps) = @_;
+    my ($tmp_dir, $timeline, $start_time, $end_time, $fps, $width, $height) = @_;
     my $iter = $timeline->get_iterator( $start_time, $end_time, 1 / $fps );
 
     my $data = $iter->();
+    # With 8 digits at 30fps, should be good for 925 hours of video
     my $frame_index = '00000000';
     while(defined $data) {
         my $time = $data->{time};
         say "Writing frame $frame_index at time $$time[0],$$time[1]";
+        my $file = $tmp_dir . '/' . $frame_index . '.png';
+
+        my $overlay = Local::VideoOverlay::FullOverlay->new({
+            width       => $width,
+            height      => $height,
+            accel_x     => $data->{accel}{x},
+            accel_y     => $data->{accel}{y},
+            accel_z     => $data->{accel}{z},
+            max_accel_x => 1.5,
+            max_accel_y => 1.5,
+            max_accel_z => 1.5,
+            gps_lat     => $data->{gps}{lat},
+            gps_long    => $data->{gps}{long},
+            gps_lat_ns  => $data->{gps}{ns},
+            gps_long_ew => $data->{gps}{ew},
+            gps_kph     => $data->{gps}{kph},
+        });
+        my $img = $overlay->make_frame;
+        $img->write(
+            file => $file,
+            type => 'png',
+        );
+
         $data = $iter->();
         $frame_index = sprintf( '%08d', $frame_index + 1 );
     }
@@ -120,6 +151,27 @@ sub decode_json_file
     return $data;
 }
 
+sub output_overlay_vid
+{
+    my ($tmp_dir, $output_file) = @_;
+    my $cur_cwd = Cwd::getcwd();
+    chdir $tmp_dir;
+
+    my $cmd = join(' ', 'ffmpeg',
+        '-i %08d.png',
+        '-r 30',
+        '-vcodec png',
+        'overlay.mov',
+    );
+    (system( $cmd ) == 0)
+        or die "Could not run system($cmd): $?";
+
+    chdir $cur_cwd;
+    File::Copy::move( $tmp_dir . '/overlay.mov', $output_file );
+    
+    return 1;
+}
+
 
 {
     my $vid_json   = decode_json_file( $VID_JSON );
@@ -128,10 +180,16 @@ sub decode_json_file
 
     my $timeline = Local::VideoOverlay::Timeline->new;
     fill_timeline( $timeline, $accel_json, $gps_json );
-    my $tmp_dir = File::Temp::tempdir( CLEANUP => 1 );
+    my $tmp_dir = File::Temp::tempdir(
+        CLEANUP => 1,
+    );
     my ($start_time, $end_time, $width, $height, $fps)
         = parse_vid_data( $vid_json );
     say "Starting at $$start_time[0],$$start_time[1]";
-    say "Writing to $tmp_dir";
-    create_overlay_pngs( $tmp_dir, $timeline, $start_time, $end_time, $fps );
+    create_overlay_pngs( $tmp_dir, $timeline, $start_time, $end_time, $fps,
+        $width, $height );
+    say "All PNGs written to $tmp_dir";
+    say "Creating video to $OUTPUT";
+    output_overlay_vid( $tmp_dir, $OUTPUT );
+    say "Done creating $OUTPUT";
 }
