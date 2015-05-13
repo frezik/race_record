@@ -19,6 +19,8 @@ Here's an overview of the important scripts:
   make_overlay_video.pl
 * vid_server.pl - Small web server that hosts the files in public/
 
+The layout for a lasercut case is in caseplans.svg.
+
 
 SPECIAL THANKS
 ==============
