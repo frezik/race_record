@@ -1,3 +1,25 @@
+This records video from the Raspberry Pi camera, while also logging getting data 
+from an accelerometer (LSM303DLHC) and GPS (Adafruit Ultimate GPS Module).  It 
+can then overlay the collected data into a single video.
+
+For hooking up everything to the Raspberry Pi, see pins.txt.
+
+All data gets logged to the public/ directory.
+
+Here's an overview of the important scripts:
+
+* listener.sh - Waits for the button to be pressed, then starts the data logging 
+  until the button is pressed again.
+* record_accel.pl - Records accelerometer data
+* record_gps.pl - Records GPS data
+* record_video.pl - Records video
+* make_overlay_video.pl - Creates an .mov which shows the accelerometer/GPS 
+  data as an overlay
+* combine_overlay.sh - Combines the main video with the overlay created by 
+  make_overlay_video.pl
+* vid_server.pl - Small web server that hosts the files in public/
+
+
 SPECIAL THANKS
 ==============
 Nirmal Biswas for font 'Typeone': http://www.dafont.com/nirmal-biswas.d3277
