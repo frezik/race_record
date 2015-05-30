@@ -34,13 +34,9 @@ open( my $out, '>', $DATA_FILE ) or die "Can't open '$DATA_FILE': $!\n";
 
 GStreamer1::init([ $0, @ARGV ]);
 my $pipeline = GStreamer1::Pipeline->new( 'pipeline' );
-$SIG{TERM} = $SIG{INT} = sub {
-    print $out $json->end;
-    close $out;
-    $pipeline->set_state( "null" );
-    exit 0;
-};
+$SIG{TERM} = $SIG{INT} = \&end;
 
+my $loop = Glib::MainLoop->new;
 
 my $rpi        = GStreamer1::ElementFactory::make( rpicamsrc => 'and_who' );
 my $h264parse  = GStreamer1::ElementFactory::make( h264parse => 'are_you' );
@@ -95,12 +91,43 @@ $capsfilter->link( $vid_queue );
 $vid_queue->link( $muxer );
 $muxer->link( $sink );
 
+my $bus = $pipeline->get_bus;
+$bus->add_watch( \&bus_callback, $loop );
+
 $pipeline->set_state( "playing" );
-print $out $json->start;
-print $out $json->output({
-    width  => $WIDTH,
-    height => $HEIGHT,
-    fps    => $FPS,
-});
-Gtk2->main;
+$loop->run;
 $pipeline->set_state( "null" );
+end();
+
+
+sub bus_callback
+{
+    my ($bus, $msg, $loop) = @_;
+
+    if( $msg->type & 'error' ) {
+        warn $msg->error;
+        $loop->quit;
+    }
+    elsif( $msg->type & 'eos' ) {
+        $loop->quit;
+    }
+    elsif( $msg->type & 'stream-start' ) {
+        warn "Started stream\n";
+        print $out $json->start;
+        print $out $json->output({
+            width  => $WIDTH,
+            height => $HEIGHT,
+            fps    => $FPS,
+        });
+    }
+
+    return TRUE;
+}
+
+sub end
+{
+    print $out $json->end;
+    close $out;
+    $pipeline->set_state( "null" );
+    exit 0;
+}
