@@ -1,4 +1,5 @@
 #!/bin/bash
+PATH=/bin:/usr/bin:/usr/local/bin
 SWITCH_PIN=22
 LED_PIN=24
 OUTPUT_DIR="public"
