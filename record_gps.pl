@@ -61,7 +61,6 @@ $gps->add_callback( $gps->CALLBACK_POSITION, sub {
         $long_deg, $long_min, $long_sec, $ew,
         $quality, $satellites, $horz_dil, $altitude, $height, 
         $time_since_last_dgps, $dgps_station_id) = @_;
-DEBUG: $DB::single = 1;
     print $out $json->output({
         time => [Time::HiRes::gettimeofday],
         ns   => $ns,
