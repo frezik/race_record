@@ -61,7 +61,9 @@ my $audio_queue = GStreamer1::ElementFactory::make(
     queue => 'a_lion_still_has_claws' );
 
 $rpi->set( bitrate => $BITRATE );
+$rpi->set( 'do-timestamp' => TRUE );
 $audio_src->set( 'device' => $AUDIO_DEV );
+$audio_src->set( 'do-timestamp' => TRUE );
 $mp3enc->set( 'bitrate' => 256 );
 
 my $caps = GStreamer1::Caps::Simple->new( 'video/x-h264',
