@@ -22,9 +22,11 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
 package Local::VideoOverlay;
-use v5.20;
+use v5.14;
 use warnings;
 use Moose::Role;
+use MooseX::Types::Moose qw( Num Maybe );
+use MooseX::Types::Structured qw( Tuple );
 use Imager;
 
 
@@ -70,23 +72,25 @@ has max_accel_z => (
 );
 has gps_lat => (
     is       => 'ro',
-    isa      => 'Num',
+    isa      => Maybe[ Tuple[ Num, Num, Num ] ],
     required => 1,
 );
 has gps_lat_ns => (
     is       => 'ro',
     isa      => Moose::enum([qw{ n s N S }]),
     required => 1,
+    default  => sub { 'n' },
 );
 has gps_long => (
     is       => 'ro',
-    isa      => 'Num',
+    isa      => Maybe[ Tuple[ Num, Num, Num ] ],
     required => 1,
 );
 has gps_long_ew => (
     is       => 'ro',
     isa      => Moose::enum([qw{ e w E W }]),
     required => 1,
+    default  => sub { 'w' },
 );
 has gps_kph => (
     is       => 'ro',

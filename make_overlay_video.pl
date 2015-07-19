@@ -107,25 +107,26 @@ sub create_overlay_pngs
     my $frame_index = '00000000';
     while(defined $data) {
         my $time = $data->{time};
-        say "Writing frame $frame_index at time $$time[0],$$time[1]";
         my $file = $tmp_dir . '/' . $frame_index . '.png';
+        say "Writing $file at time $$time[0],$$time[1]";
 
         my $overlay = Local::VideoOverlay::FullOverlay->new({
             width       => $width,
             height      => $height,
-            accel_x     => $data->{accel}{x},
-            accel_y     => $data->{accel}{y},
-            accel_z     => $data->{accel}{z},
+            accel_x     => $data->{accel}{x} // 0,
+            accel_y     => $data->{accel}{y} // 0,
+            accel_z     => $data->{accel}{z} // 0,
             max_accel_x => 1.5,
             max_accel_y => 1.5,
             max_accel_z => 1.5,
             gps_lat     => $data->{gps}{lat},
             gps_long    => $data->{gps}{long},
-            gps_lat_ns  => $data->{gps}{ns},
-            gps_long_ew => $data->{gps}{ew},
-            gps_kph     => $data->{gps}{kph},
+            gps_lat_ns  => $data->{gps}{ns} // 'n',
+            gps_long_ew => $data->{gps}{ew} // 'e',
+            gps_kph     => $data->{gps}{kph} // 0,
         });
         my $img = $overlay->make_frame;
+
         $img->write(
             file => $file,
             type => 'png',
@@ -157,12 +158,13 @@ sub output_overlay_vid
     my $cur_cwd = Cwd::getcwd();
     chdir $tmp_dir;
 
-    my $cmd = join(' ', 'ffmpeg',
+    my $cmd = join(' ', 'avconv',
         '-i %08d.png',
         '-r 30',
         '-vcodec png',
         'overlay.mov',
     );
+    warn $cmd . "\n";
     (system( $cmd ) == 0)
         or die "Could not run system($cmd): $?";
 
@@ -181,7 +183,7 @@ sub output_overlay_vid
     my $timeline = Local::VideoOverlay::Timeline->new;
     fill_timeline( $timeline, $accel_json, $gps_json );
     my $tmp_dir = File::Temp::tempdir(
-        CLEANUP => 1,
+#        CLEANUP => 1,
     );
     my ($start_time, $end_time, $width, $height, $fps)
         = parse_vid_data( $vid_json );

@@ -6,3 +6,6 @@ requires 'AnyEvent',                   '7.08';
 requires 'JSON::XS',                   '3.01';
 requires 'GPS::NMEA',                  '0.17';
 requires 'Mojolicious',                '6.08';
+requires 'Tie::Array::Sorted',         '1.41';
+requires 'Device::GPS',                '0.714874475569562';
+requires 'MooseX::Types::Structured ', '0.33';
