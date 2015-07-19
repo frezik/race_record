@@ -49,7 +49,8 @@ my $capsfilter = GStreamer1::ElementFactory::make(
 my $sink    = GStreamer1::ElementFactory::make(
     filesink => 'that_i_should_bow_so_low' );
 my $vid_queue = GStreamer1::ElementFactory::make( 'queue' => 'only_a_cat' );
-my $muxer = GStreamer1::ElementFactory::make( 'avimux' => 'of_a_different_coat');
+my $muxer = GStreamer1::ElementFactory::make(
+    'matroskamux' => 'of_a_different_coat');
 my $audio_src = GStreamer1::ElementFactory::make(
     'alsasrc' => 'the_only_truth_i_know' );
 my $audio_caps = GStreamer1::ElementFactory::make(
@@ -60,7 +61,9 @@ my $audio_queue = GStreamer1::ElementFactory::make(
     queue => 'a_lion_still_has_claws' );
 
 $rpi->set( bitrate => $BITRATE );
+$rpi->set( 'do-timestamp' => TRUE );
 $audio_src->set( 'device' => $AUDIO_DEV );
+$audio_src->set( 'do-timestamp' => TRUE );
 $mp3enc->set( 'bitrate' => 256 );
 
 my $caps = GStreamer1::Caps::Simple->new( 'video/x-h264',
@@ -78,6 +81,7 @@ my $caps_audio = GStreamer1::Caps::Simple->new( 'audio/x-raw',
 $audio_caps->set( caps => $caps_audio );
 
 $sink->set( 'location' => $VID_FILE );
+$sink->set( 'sync' => TRUE );
 
 
 $pipeline->add( $muxer );
