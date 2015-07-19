@@ -26,7 +26,7 @@ do
     # This gives the GPS and accel recorders a chance to get going before 
     # we start the Big One
     sleep 2
-    ./record_video.pl --vid-file="${FILE_PREFIX}.avi" --data-file="${FILE_PREFIX}_vid_data.json" &
+    ./record_video.pl --vid-file="${FILE_PREFIX}.mkv" --data-file="${FILE_PREFIX}_vid_data.json" &
     VID_PID=$!
 
 
