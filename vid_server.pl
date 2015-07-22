@@ -11,7 +11,10 @@ get '/' => sub {
 
     opendir( my $dir, VIDEO_DIR )
         or die "Can't open " . VIDEO_DIR . " for reading: $!\n";
-    my @files = grep { -f (VIDEO_DIR . $_) } readdir $dir;
+    my @files = sort grep {
+        (-f (VIDEO_DIR . $_))
+        && ($_ !~ /\A\./)
+    } readdir $dir;
     closedir $dir;
 
     $c->render(
